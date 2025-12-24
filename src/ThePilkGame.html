@@ -75,6 +75,17 @@
             min-height: 100px;
         }
 
+        /* Wikipedia Link Styling */
+        .mixture-list a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .mixture-list a:hover {
+            color: var(--accent);
+        }
+
         .percentage { font-weight: bold; color: var(--accent); }
         .oz-label { opacity: 0.7; font-size: 0.85rem; pointer-events: none;}
 
@@ -95,7 +106,7 @@
 <body>
 
     <h1>Would You Rather? Pilk Edition</h1>
-    <div class="subtitle">Click a card to roll</div>
+    <div class="subtitle">Click a card to roll | Click an ingredient to learn</div>
 
     <div class="game-container">
         <div class="card" id="cardA" onclick="generateGame()">
@@ -135,7 +146,7 @@
                 generateGame();
             } catch (error) {
                 console.error("Error loading CSV files:", error);
-                alert("Could not load CSV data. Make sure ilks.csv and ps.csv are in the same folder and you are using a local server.");
+                alert("Could not load CSV data. Make sure ilks.csv and ps.csv are in the same folder.");
             }
         }
 
@@ -152,6 +163,14 @@
             });
         }
 
+        // --- WIKIPEDIA SUPPORT ---
+        function getWikiLink(name) {
+            // "Piss" should likely point to "Urine" for a better Wiki experience,
+            // but we use the provided format (Capitalized_Name) as requested.
+            let wikiName = name.split(' ').join('_');
+            return `<a href="https://en.wikipedia.org/wiki/${wikiName}" target="_blank" onclick="event.stopPropagation()">${name}</a>`;
+        }
+
         // --- GAME LOGIC ---
         function generateGame() {
             if (registry.ilk.length === 0 || registry.p.length === 0) return;
@@ -162,8 +181,6 @@
             const itemP = possiblePs[Math.floor(Math.random() * possiblePs.length)];
             const itemI = registry.ilk[Math.floor(Math.random() * registry.ilk.length)];
 
-            // Updated range: Math.random() * (Max - Min) + Min
-            // (Math.random() * 4.9 + 0.1) results in a range of 0.1% to 5.0%
             const pPct = isDeadly ? +(Math.random() * 4.9 + 0.1).toFixed(2) : Math.floor(Math.random() * 60);
             const iPct = +(100 - pPct).toFixed(2);
 
@@ -172,7 +189,7 @@
                 { ...itemI, pct: iPct }
             ]);
 
-            // Option A (Left Card - Classic Logic)
+            // Option A (Left Card)
             const piss = registry.p.find(f => f.name === "Piss") || { cost: 0, color: "#FFD700" };
             const pepsi = registry.p.find(f => f.name === "Pepsi") || { cost: 0.03, color: "#2b1d1d" };
             const milk = registry.ilk.find(f => f.name === "Whole Milk") || { cost: 0.03, color: "#fdfbf7" };
@@ -201,20 +218,16 @@
             ingredients.forEach(ing => {
                 if (ing.pct <= 0) return;
 
-                // 1. Calculate actual values for text and cost
                 const oz = (ing.pct / 100 * 16);
                 totalCost += (oz * ing.cost);
 
-                // 2. Determine the Visual Height
-                // If it's the Chaos side (right), the item is deadly, and pct is < 5, force 7% height
                 let displayHeight = ing.pct;
                 if (side === 'right' && ing.isDeadly && ing.pct < 5) {
                     displayHeight = 7;
                 }
 
-                // 3. Update the HTML
-                // We use Number(ing.pct) for the label, but displayHeight for the CSS style
-                listHtml += `<li><span class="percentage">${Number(ing.pct)}%</span> ${ing.name} <span class="oz-label">(${oz.toFixed(1)}oz)</span></li>`;
+                // Wrap ing.name with getWikiLink()
+                listHtml += `<li><span class="percentage">${Number(ing.pct)}%</span> ${getWikiLink(ing.name)} <span class="oz-label">(${oz.toFixed(1)}oz)</span></li>`;
                 vizHtml = `<div class="layer" style="height:${displayHeight}%; background-color:${ing.color}"></div>` + vizHtml;
             });
 
@@ -223,7 +236,6 @@
             document.getElementById(vizId).innerHTML = vizHtml;
         }
 
-        // Initialize on Load
         loadData();
     </script>
 </body>
