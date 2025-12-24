@@ -1,0 +1,23 @@
+Name,Cost_per_oz,Is_Deadly,Hex_Code
+Whole Milk,0.03,false,#fdfbf7
+Skimmed Milk,0.03,false,#f8f9fa
+Goat Milk,0.18,false,#f4f1e8
+Buttermilk,0.05,false,#fcfaf2
+Breast Milk,2.50,false,#fffdd0
+Condensed Milk,0.12,false,#f3e5ab
+Almond Milk,0.07,false,#eaddca
+Oat Milk,0.08,false,#e3dac9
+Soy Milk,0.06,false,#f4f1e8
+Cashew Milk,0.11,false,#f0e6d2
+Coconut Milk,0.14,false,#fffafa
+Chocolate Milk,0.05,false,#7b3f00
+Strawberry Milk,0.05,false,#ffb7c5
+Coffee Milk,0.07,false,#cba17d
+Pistachio Milk,0.22,false,#d3e0c8
+Rat Milk,85.00,false,#e8e4da
+Camel Milk,1.40,false,#e8e4da
+Buffalo Milk,0.25,false,#e8e4da
+Donkey Milk,1.10,false,#e8e4da
+Yak Milk,0.90,false,#e8e4da
+Reindeer Milk,4.50,false,#e8e4da
+Moose Milk,12.00,false,#e8e4da

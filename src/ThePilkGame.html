@@ -8,9 +8,6 @@
         :root {
             --glass: rgba(255, 255, 255, 0.1);
             --accent: #00d2ff;
-            --piss: #FFD700;
-            --milk: #fdfbf7;
-            --pepsi: #2b1d1d;
             --price-tag: #45f542;
         }
 
@@ -27,29 +24,10 @@
             padding: 20px;
         }
 
-        h1 {
-            font-size: 2.8rem;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 20px var(--accent);
-            text-align: center;
-        }
+        h1 { font-size: 2.8rem; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 5px; text-shadow: 0 0 20px var(--accent); text-align: center; }
+        .subtitle { margin-bottom: 30px; color: rgba(255, 255, 255, 0.6); letter-spacing: 2px; text-align: center; }
 
-        .subtitle {
-            margin-bottom: 30px;
-            color: rgba(255, 255, 255, 0.6);
-            letter-spacing: 2px;
-            text-align: center;
-        }
-
-        .game-container {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 1200px;
-        }
+        .game-container { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; max-width: 1200px; }
 
         .card {
             background: var(--glass);
@@ -67,11 +45,7 @@
             cursor: pointer;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.15);
-        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); background: rgba(255, 255, 255, 0.15); }
 
         .glass-visual {
             width: 70px;
@@ -101,16 +75,6 @@
             min-height: 100px;
         }
 
-        .mixture-list a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .mixture-list a:hover {
-            color: var(--accent);
-        }
-
         .percentage { font-weight: bold; color: var(--accent); }
         .oz-label { opacity: 0.7; font-size: 0.85rem; pointer-events: none;}
 
@@ -126,141 +90,141 @@
         }
 
         .footer { margin-top: 50px; color: rgba(255, 255, 255, 0.4); }
-        .footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <h1>Would You Rather? Pilk Edition</h1>
-    <div class="subtitle">Click a card to roll | Click an ingredient to learn</div>
+    <div class="subtitle">Click a card to roll</div>
 
     <div class="game-container">
-        <div class="card" onclick="generateGame()">
-            <h2>Option A</h2>
-            <div class="glass-visual">
-                <div id="layerPepsi" class="layer" style="background-color: var(--pepsi);"></div>
-                <div id="layerMilk" class="layer" style="background-color: var(--milk);"></div>
-                <div id="layerPiss" class="layer" style="background-color: var(--piss);"></div>
-            </div>
+        <div class="card" id="cardA" onclick="generateGame()">
+            <h2>Original Pilk</h2>
+            <div class="glass-visual" id="vizA"></div>
             <ul class="mixture-list" id="leftContent"></ul>
             <div class="total-price" id="leftTotal">Total: $0.00</div>
         </div>
 
-        <div class="card" onclick="generateGame()">
-            <h2>Option B</h2>
-            <div class="glass-visual">
-                <div id="layerPLiquid" class="layer"></div>
-                <div id="layerIlkLiquid" class="layer"></div>
-            </div>
+        <div class="card" id="cardB" onclick="generateGame()">
+            <h2>Chaos Pilk</h2>
+            <div class="glass-visual" id="vizB"></div>
             <ul class="mixture-list" id="rightContent"></ul>
             <div class="total-price" id="rightTotal">Total: $0.00</div>
         </div>
     </div>
 
-    <div class="footer">
-        Brought to you by <a href="https://discord.gg/JKrVqPAfBE" target="_blank">GKGN</a>
-    </div>
+    <div class="footer">Brought to you by GKGN</div>
 
     <script>
-        const prices = {
-            "Piss": 0.00, "Pepsi": 0.03, "Whole Milk": 0.03, "Skim Milk": 0.03,
-            "Goat Milk": 0.18, "Buttermilk": 0.05, "Breast Milk": 2.50,
-            "Condensed Milk": 0.12, "Almond Milk": 0.07, "Oat Milk": 0.08,
-            "Soy Milk": 0.06, "Cashew Milk": 0.11, "Coconut Milk": 0.14,
-            "Chocolate Milk": 0.05, "Strawberry Milk": 0.05, "Coffee Milk": 0.07,
-            "Pistachio Milk": 0.22, "Rat Milk": 85.00, "Camel Milk": 1.40,
-            "Buffalo Milk": 0.25, "Donkey Milk": 1.10, "Yak Milk": 0.90,
-            "Reindeer Milk": 4.50, "Moose Milk": 12.00, "Palm oil": 0.09,
-            "Peanut oil": 0.14, "Paraffin oil": 0.25, "Patchouli oil": 5.50,
-            "Pine oil": 0.40, "Pineapple juice": 0.06, "Prune juice": 0.10,
-            "Pomegranate juice": 0.28, "Pinot Noir": 0.65, "Plum wine": 0.55,
-            "Pisco": 1.10, "Pickle juice": 0.04, "Perchloric acid": 12.50,
-            "Petroleum": 0.02, "Phosphoric acid": 0.85, "Propanol": 0.45,
-            "Propylene glycol": 0.35, "Plasma": 25.00
-        };
+        let registry = { ilk: [], p: [] };
 
-        const colors = {
-            "Whole Milk": "#fdfbf7", "Skim Milk": "#f8f9fa", "Goat Milk": "#f4f1e8",
-            "Buttermilk": "#fcfaf2", "Breast Milk": "#fffdd0", "Condensed Milk": "#f3e5ab",
-            "Almond Milk": "#eaddca", "Oat Milk": "#e3dac9", "Soy Milk": "#f4f1e8",
-            "Cashew Milk": "#f0e6d2", "Coconut Milk": "#fffafa", "Chocolate Milk": "#7b3f00",
-            "Strawberry Milk": "#ffb7c5", "Coffee Milk": "#cba17d", "Pistachio Milk": "#d3e0c8",
-            "Rat Milk": "#e8e4da", "Camel Milk": "#e8e4da", "Buffalo Milk": "#e8e4da",
-            "Donkey Milk": "#e8e4da", "Yak Milk": "#e8e4da", "Reindeer Milk": "#e8e4da",
-            "Moose Milk": "#e8e4da", "Palm oil": "#ffb300", "Peanut oil": "#e1ad01",
-            "Paraffin oil": "#fcecba", "Patchouli oil": "#c5a000", "Pine oil": "#efd35e",
-            "Pineapple juice": "#ffd700", "Prune juice": "#581845", "Pomegranate juice": "#c0392b",
-            "Pinot Noir": "#722f37", "Plum wine": "#900C3F", "Pisco": "#f4e4c1",
-            "Pickle juice": "#c9db62", "Perchloric acid": "#d4e6f1", "Petroleum": "#2c3e50",
-            "Phosphoric acid": "#d4e6f1", "Propanol": "#d4e6f1", "Propylene glycol": "#d4e6f1",
-            "Plasma": "#fada5e"
-        };
+        // --- DATA LOADING ---
+        async function loadData() {
+            try {
+                const [ilkResponse, pResponse] = await Promise.all([
+                    fetch('../data/ilks.csv'),
+                    fetch('../data/ps.csv')
+                ]);
 
-        const safeP = ["Palm oil", "Peanut oil", "Pickle juice", "Pineapple juice", "Pinot Noir", "Pisco", "Plum wine", "Pomegranate juice", "Prune juice"];
-        const deadlyP = ["Paraffin oil", "Perchloric acid", "Petroleum", "Phosphoric acid", "Propanol", "Propylene glycol", "Patchouli oil", "Pine oil", "Plasma"];
-        const ilks = ["Whole Milk", "Almond Milk", "Oat Milk", "Breast Milk", "Soy Milk", "Cashew Milk", "Skim Milk", "Condensed Milk", "Goat Milk", "Coconut Milk", "Chocolate Milk", "Pistachio Milk", "Strawberry Milk", "Coffee Milk", "Rat Milk", "Buttermilk", "Camel Milk", "Buffalo Milk", "Donkey Milk", "Yak Milk", "Reindeer Milk", "Moose Milk"];
+                const ilkText = await ilkResponse.text();
+                const pText = await pResponse.text();
 
-        function getWikiLink(name) {
-            let wikiName = name.split(' ').join('_');
-            return `<a href="https://en.wikipedia.org/wiki/${wikiName}" target="_blank" onclick="event.stopPropagation()">${name}</a>`;
-        }
+                registry.ilk = parseCSV(ilkText);
+                registry.p = parseCSV(pText);
 
-        function generateGame() {
-            // --- OPTION B (RIGHT) FIRST ---
-            const isDeadly = Math.random() < 0.5;
-            let pNameR = isDeadly ? deadlyP[Math.floor(Math.random()*deadlyP.length)] : safeP[Math.floor(Math.random()*safeP.length)];
-            let pPctR = isDeadly ? (Math.random()*(2-0.01)+0.01).toFixed(2) : Math.floor(Math.random()*101);
-            let iPctR = (100 - pPctR).toFixed(2);
-            let iNameR = ilks[Math.floor(Math.random()*ilks.length)];
-            let ozPR = (pPctR/100*16), ozIR = (iPctR/100*16);
-            let costR = (ozPR * prices[pNameR]) + (ozIR * prices[iNameR]);
-
-            document.getElementById('layerPLiquid').style.height = pPctR + "%";
-            document.getElementById('layerPLiquid').style.backgroundColor = colors[pNameR];
-            document.getElementById('layerIlkLiquid').style.height = iPctR + "%";
-            document.getElementById('layerIlkLiquid').style.backgroundColor = colors[iNameR];
-            document.getElementById('rightContent').innerHTML = `
-                <li><span class="percentage">${pPctR}%</span> ${getWikiLink(pNameR)} <span class="oz-label">(${ozPR.toFixed(2)}oz @ $${prices[pNameR].toFixed(2)}/oz)</span></li>
-                <li><span class="percentage">${iPctR}%</span> ${getWikiLink(iNameR)} <span class="oz-label">(${ozIR.toFixed(2)}oz @ $${prices[iNameR].toFixed(2)}/oz)</span></li>
-            `;
-            document.getElementById('rightTotal').innerText = `Total: $${costR.toFixed(2)}`;
-
-            // --- OPTION A (LEFT) ---
-            let p1;
-            if (isDeadly) {
-                // Deadly Logic: Guaranteed Piss with High Ceilings
-                const roll = Math.random();
-                if (roll < 0.8) {
-                    p1 = Math.floor(Math.random() * 33) + 1; // 1-33%
-                } else {
-                    let extra = Math.floor(Math.pow(Math.random(), 3) * 17);
-                    p1 = 33 + extra; // 33-50%
-                }
-            } else {
-                // Safe Logic: Guaranteed Piss but strictly 1-15%
-                p1 = Math.floor(Math.random() * 15) + 1;
+                generateGame();
+            } catch (error) {
+                console.error("Error loading CSV files:", error);
+                alert("Could not load CSV data. Make sure ilks.csv and ps.csv are in the same folder and you are using a local server.");
             }
-
-            let remaining = 100 - p1;
-            let p2 = Math.floor(Math.random() * (remaining + 1));
-            let p3 = remaining - p2;
-
-            let oz1 = (p1/100*16), oz2 = (p2/100*16), oz3 = (p3/100*16);
-            let costL = (oz2 * prices["Whole Milk"]) + (oz3 * prices["Pepsi"]);
-
-            document.getElementById('layerPiss').style.height = p1 + "%";
-            document.getElementById('layerMilk').style.height = p2 + "%";
-            document.getElementById('layerPepsi').style.height = p3 + "%";
-
-            let leftHTML = `<li><span class="percentage">${p1}%</span> ${getWikiLink("Piss")} <span class="oz-label">(${oz1.toFixed(2)}oz @ $0/oz)</span></li>`;
-            if (p2 > 0) leftHTML += `<li><span class="percentage">${p2}%</span> ${getWikiLink("Whole Milk")} <span class="oz-label">(${oz2.toFixed(2)}oz @ $${prices["Whole Milk"]}/oz)</span></li>`;
-            if (p3 > 0) leftHTML += `<li><span class="percentage">${p3}%</span> ${getWikiLink("Pepsi")} <span class="oz-label">(${oz3.toFixed(2)}oz @ $${prices["Pepsi"]}/oz)</span></li>`;
-
-            document.getElementById('leftContent').innerHTML = leftHTML;
-            document.getElementById('leftTotal').innerText = `Total: $${costL.toFixed(2)}`;
         }
 
-        generateGame();
+        function parseCSV(text) {
+            const rows = text.trim().split('\n').slice(1);
+            return rows.map(row => {
+                const [name, cost, deadly, color] = row.split(',');
+                return {
+                    name: name.trim(),
+                    cost: parseFloat(cost),
+                    isDeadly: deadly.trim().toLowerCase() === 'true',
+                    color: color.trim()
+                };
+            });
+        }
+
+        // --- GAME LOGIC ---
+        function generateGame() {
+            if (registry.ilk.length === 0 || registry.p.length === 0) return;
+
+            // Option B (Right Card)
+            const isDeadly = Math.random() < 0.5;
+            const possiblePs = isDeadly ? registry.p.filter(f => f.isDeadly) : registry.p.filter(f => !f.isDeadly);
+            const itemP = possiblePs[Math.floor(Math.random() * possiblePs.length)];
+            const itemI = registry.ilk[Math.floor(Math.random() * registry.ilk.length)];
+
+            // Updated range: Math.random() * (Max - Min) + Min
+            // (Math.random() * 4.9 + 0.1) results in a range of 0.1% to 5.0%
+            const pPct = isDeadly ? +(Math.random() * 4.9 + 0.1).toFixed(2) : Math.floor(Math.random() * 60);
+            const iPct = +(100 - pPct).toFixed(2);
+
+            render('right', [
+                { ...itemP, pct: pPct },
+                { ...itemI, pct: iPct }
+            ]);
+
+            // Option A (Left Card - Classic Logic)
+            const piss = registry.p.find(f => f.name === "Piss") || { cost: 0, color: "#FFD700" };
+            const pepsi = registry.p.find(f => f.name === "Pepsi") || { cost: 0.03, color: "#2b1d1d" };
+            const milk = registry.ilk.find(f => f.name === "Whole Milk") || { cost: 0.03, color: "#fdfbf7" };
+
+            const pissPct = isDeadly ? Math.floor(Math.random() * 30) + 1 : Math.floor(Math.random() * 10) + 1;
+            const remaining = 100 - pissPct;
+            const milkPct = Math.floor(Math.random() * remaining);
+            const pepsiPct = remaining - milkPct;
+
+            render('left', [
+                { name: "Piss", pct: pissPct, color: piss.color, cost: piss.cost },
+                { name: "Whole Milk", pct: milkPct, color: milk.color, cost: milk.cost },
+                { name: "Pepsi", pct: pepsiPct, color: pepsi.color, cost: pepsi.cost }
+            ]);
+        }
+
+        function render(side, ingredients) {
+            const listId = side === 'left' ? 'leftContent' : 'rightContent';
+            const totalId = side === 'left' ? 'leftTotal' : 'rightTotal';
+            const vizId = side === 'left' ? 'vizA' : 'vizB';
+
+            let listHtml = "";
+            let vizHtml = "";
+            let totalCost = 0;
+
+            ingredients.forEach(ing => {
+                if (ing.pct <= 0) return;
+
+                // 1. Calculate actual values for text and cost
+                const oz = (ing.pct / 100 * 16);
+                totalCost += (oz * ing.cost);
+
+                // 2. Determine the Visual Height
+                // If it's the Chaos side (right), the item is deadly, and pct is < 5, force 7% height
+                let displayHeight = ing.pct;
+                if (side === 'right' && ing.isDeadly && ing.pct < 5) {
+                    displayHeight = 7;
+                }
+
+                // 3. Update the HTML
+                // We use Number(ing.pct) for the label, but displayHeight for the CSS style
+                listHtml += `<li><span class="percentage">${Number(ing.pct)}%</span> ${ing.name} <span class="oz-label">(${oz.toFixed(1)}oz)</span></li>`;
+                vizHtml = `<div class="layer" style="height:${displayHeight}%; background-color:${ing.color}"></div>` + vizHtml;
+            });
+
+            document.getElementById(listId).innerHTML = listHtml;
+            document.getElementById(totalId).innerText = `Total: $${totalCost.toFixed(2)}`;
+            document.getElementById(vizId).innerHTML = vizHtml;
+        }
+
+        // Initialize on Load
+        loadData();
     </script>
 </body>
 </html>

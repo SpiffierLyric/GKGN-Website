@@ -1,0 +1,21 @@
+Name,Cost_per_oz,Is_Deadly,Hex_Code
+Piss,0.00,false,#FFD700
+Pepsi,0.03,false,#2b1d1d
+Palm oil,0.09,false,#ffb300
+Peanut oil,0.14,false,#e1ad01
+Paraffin oil,0.25,true,#fcecba
+Patchouli oil,5.50,true,#c5a000
+Pine oil,0.40,true,#efd35e
+Pineapple juice,0.06,false,#ffd700
+Prune juice,0.10,false,#581845
+Pomegranate juice,0.28,false,#c0392b
+Pinot Noir,0.65,false,#722f37
+Plum wine,0.55,false,#900C3F
+Pisco,1.10,false,#f4e4c1
+Pickle juice,0.04,false,#c9db62
+Perchloric acid,12.50,true,#d4e6f1
+Petroleum,0.02,true,#2c3e50
+Phosphoric acid,0.85,true,#d4e6f1
+Propanol,0.45,true,#d4e6f1
+Propylene glycol,0.35,true,#d4e6f1
+Plasma,25.00,true,#fada5e
