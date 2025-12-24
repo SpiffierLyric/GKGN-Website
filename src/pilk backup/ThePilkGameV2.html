@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Would You Rather: Liquid Edition</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --accent: #00d2ff;
+            /* Left Side Fixed Colors */
+            --piss: #FFD700;
+            --milk: #fdfbf7;
+            --pepsi: #2b1d1d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px var(--accent);
+            text-align: center;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1100px;
+            align-items: stretch;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            width: 380px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* The Visual Glass Container */
+        .glass-visual {
+            width: 80px;
+            height: 150px;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            border-top: none;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column-reverse; /* Stacks liquids from bottom up */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Individual Liquid Layers */
+        .layer {
+            width: 100%;
+            transition: height 0.5s ease-in-out, background-color 0.5s ease-in-out;
+        }
+
+        .mixture-list {
+            list-style: none;
+            padding: 0;
+            font-size: 1.1rem;
+            line-height: 2;
+            width: 100%;
+            text-align: left;
+        }
+
+        .percentage {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .oz-label {
+            font-style: italic;
+            opacity: 0.7;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+
+        button {
+            margin-top: 40px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: var(--accent);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        button:hover {
+            letter-spacing: 2px;
+            box-shadow: 0 0 40px var(--accent);
+            transform: scale(1.05);
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Would You Rather...</h1>
+
+    <div class="game-container">
+        <div class="card">
+            <h2>Option A</h2>
+
+            <div class="glass-visual">
+                <div id="layerPepsi" class="layer" style="background-color: var(--pepsi);"></div>
+                <div id="layerMilk" class="layer" style="background-color: var(--milk);"></div>
+                <div id="layerPiss" class="layer" style="background-color: var(--piss);"></div>
+            </div>
+
+            <ul class="mixture-list" id="leftContent"></ul>
+        </div>
+
+        <div style="align-self: center; font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px var(--accent);">VS</div>
+
+        <div class="card">
+            <h2>Option B</h2>
+
+            <div class="glass-visual">
+                <div id="layerPLiquid" class="layer"></div>
+                <div id="layerIlkLiquid" class="layer"></div>
+            </div>
+
+            <ul class="mixture-list" id="rightContent"></ul>
+        </div>
+    </div>
+
+    <button onclick="generateGame()">New Round</button>
+
+    <div class="footer">
+        Brought to you by <a href="https://discord.gg/JKrVqPAfBE" target="_blank">GKGN</a>
+    </div>
+
+    <script>
+        // Data Lists
+        const safePLiquids = ["Palm oil", "Peanut oil", "Pickle juice", "Pineapple juice", "Pinot Noir", "Pisco", "Plum wine", "Pomegranate juice", "Prune juice"];
+        const deadlyPLiquids = ["Paraffin oil", "Perchloric acid", "Petroleum", "Phosphoric acid", "Propanol", "Propylene glycol", "Patchouli oil", "Pine oil", "Plasma"];
+        const ilkLiquids = ["Whole Milk", "Almond Milk", "Oat Milk", "Breast Milk", "Soy Milk", "Cashew Milk", "Skim Milk", "Condensed Milk", "Goat Milk", "Coconut Milk", "Chocolate Milk", "Pistachio Milk", "Strawberry Milk", "Coffee Milk", "Rat Milk", "Buttermilk", "Camel Milk", "Buffalo Milk", "Donkey Milk", "Yak Milk", "Reindeer Milk", "Moose Milk"];
+
+        // Color Mapping Dictionary
+        const liquidColors = {
+            // --- MILKS (Palette: Creams, Off-whites, Beiges, specific flavors) ---
+            "Whole Milk": "#fdfbf7", "Skim Milk": "#f8f9fa", "Goat Milk": "#f4f1e8",
+            "Buttermilk": "#fcfaf2", "Breast Milk": "#fffdd0", "Condensed Milk": "#f3e5ab",
+            "Almond Milk": "#eaddca", "Oat Milk": "#e3dac9", "Soy Milk": "#f4f1e8",
+            "Cashew Milk": "#f0e6d2", "Coconut Milk": "#fffafa",
+            "Chocolate Milk": "#7b3f00", "Strawberry Milk": "#ffb7c5", "Coffee Milk": "#cba17d",
+            "Pistachio Milk": "#d3e0c8",
+            // Animal milks get a slightly greyer cream tone
+            "Rat Milk": "#e8e4da", "Camel Milk": "#e8e4da", "Buffalo Milk": "#e8e4da",
+            "Donkey Milk": "#e8e4da", "Yak Milk": "#e8e4da", "Reindeer Milk": "#e8e4da",
+            "Moose Milk": "#e8e4da",
+
+            // --- P-LIQUIDS (Palette: Golds, Reds, Purples, Clears/Blues - Distinct from Milk) ---
+            // Oils (Golds/Yellows)
+            "Palm oil": "#ffb300", "Peanut oil": "#e1ad01", "Paraffin oil": "#fcecba",
+            "Patchouli oil": "#c5a000", "Pine oil": "#efd35e",
+            // Juices/Wines (Reds/Purples/Ambers)
+            "Pineapple juice": "#ffd700", "Prune juice": "#581845",
+            "Pomegranate juice": "#c0392b", "Pinot Noir": "#722f37",
+            "Plum wine": "#900C3F", "Pisco": "#f4e4c1",
+            "Pickle juice": "#c9db62", // Greenish yellow
+            // Chemicals/Body (Clears/Blues/Weird tints)
+            "Perchloric acid": "#d4e6f1", // Clear chemical blue tint
+            "Petroleum": "#2c3e50", // Dark crude
+            "Phosphoric acid": "#d4e6f1", "Propanol": "#d4e6f1",
+            "Propylene glycol": "#d4e6f1",
+            "Plasma": "#fada5e" // Pale yellowish clear
+        };
+
+        function calculateOz(percent) {
+            return ((percent / 100) * 16).toFixed(2);
+        }
+
+        function generateGame() {
+            // --- LEFT SIDE LOGIC ---
+            let r1 = Math.random(), r2 = Math.random(), r3 = Math.random();
+            let totalLeft = r1 + r2 + r3;
+            let p1 = Math.floor((r1 / totalLeft) * 100);
+            let p2 = Math.floor((r2 / totalLeft) * 100);
+            let p3 = 100 - (p1 + p2);
+
+            // Update Left Visuals
+            document.getElementById('layerPiss').style.height = p1 + "%";
+            document.getElementById('layerMilk').style.height = p2 + "%";
+            document.getElementById('layerPepsi').style.height = p3 + "%";
+
+            document.getElementById('leftContent').innerHTML = `
+                <li><span class="percentage">${p1}%</span> Piss <span class="oz-label">(${calculateOz(p1)} oz)</span></li>
+                <li><span class="percentage">${p2}%</span> Milk <span class="oz-label">(${calculateOz(p2)} oz)</span></li>
+                <li><span class="percentage">${p3}%</span> Pepsi <span class="oz-label">(${calculateOz(p3)} oz)</span></li>
+            `;
+
+            // --- RIGHT SIDE LOGIC ---
+            const isDeadly = Math.random() < 0.5;
+            let pName, pPct, milkPct;
+
+            if (isDeadly) {
+                pName = deadlyPLiquids[Math.floor(Math.random() * deadlyPLiquids.length)];
+                // Weighted: 0.01% to 2.00% for deadly items
+                pPct = (Math.random() * (2.00 - 0.01) + 0.01).toFixed(2);
+                milkPct = (100 - parseFloat(pPct)).toFixed(2);
+            } else {
+                pName = safePLiquids[Math.floor(Math.random() * safePLiquids.length)];
+                // Standard 0-100 integer split for safe items
+                let split = Math.floor(Math.random() * 101);
+                pPct = split;
+                milkPct = 100 - split;
+            }
+
+            const ilkName = ilkLiquids[Math.floor(Math.random() * ilkLiquids.length)];
+
+            // Update Right Visuals (Colors and Heights)
+            const pLayer = document.getElementById('layerPLiquid');
+            const ilkLayer = document.getElementById('layerIlkLiquid');
+
+            pLayer.style.height = pPct + "%";
+            pLayer.style.backgroundColor = liquidColors[pName];
+
+            ilkLayer.style.height = milkPct + "%";
+            ilkLayer.style.backgroundColor = liquidColors[ilkName];
+
+            document.getElementById('rightContent').innerHTML = `
+                <li><span class="percentage">${pPct}%</span> ${pName} <span class="oz-label">(${calculateOz(pPct)} oz)</span></li>
+                <li><span class="percentage">${milkPct}%</span> ${ilkName} <span class="oz-label">(${calculateOz(milkPct)} oz)</span></li>
+            `;
+        }
+
+        // Initialize on load
+        generateGame();
+    </script>
+</body>
+</html>

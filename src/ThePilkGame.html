@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Would You Rather? Pilk Edition</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --accent: #00d2ff;
+            --piss: #FFD700;
+            --milk: #fdfbf7;
+            --pepsi: #2b1d1d;
+            --price-tag: #45f542;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px var(--accent);
+            text-align: center;
+        }
+
+        .subtitle {
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            width: 380px;
+            text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .glass-visual {
+            width: 70px;
+            height: 130px;
+            border: 4px solid #fff;
+            border-top: none;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+            pointer-events: none;
+        }
+
+        .layer { width: 100%; transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .mixture-list {
+            list-style: none;
+            padding: 0;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 20px;
+            min-height: 100px;
+        }
+
+        .mixture-list a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .mixture-list a:hover {
+            color: var(--accent);
+        }
+
+        .percentage { font-weight: bold; color: var(--accent); }
+        .oz-label { opacity: 0.7; font-size: 0.85rem; pointer-events: none;}
+
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--price-tag);
+            text-shadow: 0 0 10px rgba(69, 245, 66, 0.3);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .footer { margin-top: 50px; color: rgba(255, 255, 255, 0.4); }
+        .footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Would You Rather? Pilk Edition</h1>
+    <div class="subtitle">Click a card to roll | Click an ingredient to learn</div>
+
+    <div class="game-container">
+        <div class="card" onclick="generateGame()">
+            <h2>Option A</h2>
+            <div class="glass-visual">
+                <div id="layerPepsi" class="layer" style="background-color: var(--pepsi);"></div>
+                <div id="layerMilk" class="layer" style="background-color: var(--milk);"></div>
+                <div id="layerPiss" class="layer" style="background-color: var(--piss);"></div>
+            </div>
+            <ul class="mixture-list" id="leftContent"></ul>
+            <div class="total-price" id="leftTotal">Total: $0.00</div>
+        </div>
+
+        <div class="card" onclick="generateGame()">
+            <h2>Option B</h2>
+            <div class="glass-visual">
+                <div id="layerPLiquid" class="layer"></div>
+                <div id="layerIlkLiquid" class="layer"></div>
+            </div>
+            <ul class="mixture-list" id="rightContent"></ul>
+            <div class="total-price" id="rightTotal">Total: $0.00</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Brought to you by <a href="https://discord.gg/JKrVqPAfBE" target="_blank">GKGN</a>
+    </div>
+
+    <script>
+        const prices = {
+            "Piss": 0.00, "Pepsi": 0.03, "Whole Milk": 0.03, "Skim Milk": 0.03,
+            "Goat Milk": 0.18, "Buttermilk": 0.05, "Breast Milk": 2.50,
+            "Condensed Milk": 0.12, "Almond Milk": 0.07, "Oat Milk": 0.08,
+            "Soy Milk": 0.06, "Cashew Milk": 0.11, "Coconut Milk": 0.14,
+            "Chocolate Milk": 0.05, "Strawberry Milk": 0.05, "Coffee Milk": 0.07,
+            "Pistachio Milk": 0.22, "Rat Milk": 85.00, "Camel Milk": 1.40,
+            "Buffalo Milk": 0.25, "Donkey Milk": 1.10, "Yak Milk": 0.90,
+            "Reindeer Milk": 4.50, "Moose Milk": 12.00, "Palm oil": 0.09,
+            "Peanut oil": 0.14, "Paraffin oil": 0.25, "Patchouli oil": 5.50,
+            "Pine oil": 0.40, "Pineapple juice": 0.06, "Prune juice": 0.10,
+            "Pomegranate juice": 0.28, "Pinot Noir": 0.65, "Plum wine": 0.55,
+            "Pisco": 1.10, "Pickle juice": 0.04, "Perchloric acid": 12.50,
+            "Petroleum": 0.02, "Phosphoric acid": 0.85, "Propanol": 0.45,
+            "Propylene glycol": 0.35, "Plasma": 25.00
+        };
+
+        const colors = {
+            "Whole Milk": "#fdfbf7", "Skim Milk": "#f8f9fa", "Goat Milk": "#f4f1e8",
+            "Buttermilk": "#fcfaf2", "Breast Milk": "#fffdd0", "Condensed Milk": "#f3e5ab",
+            "Almond Milk": "#eaddca", "Oat Milk": "#e3dac9", "Soy Milk": "#f4f1e8",
+            "Cashew Milk": "#f0e6d2", "Coconut Milk": "#fffafa", "Chocolate Milk": "#7b3f00",
+            "Strawberry Milk": "#ffb7c5", "Coffee Milk": "#cba17d", "Pistachio Milk": "#d3e0c8",
+            "Rat Milk": "#e8e4da", "Camel Milk": "#e8e4da", "Buffalo Milk": "#e8e4da",
+            "Donkey Milk": "#e8e4da", "Yak Milk": "#e8e4da", "Reindeer Milk": "#e8e4da",
+            "Moose Milk": "#e8e4da", "Palm oil": "#ffb300", "Peanut oil": "#e1ad01",
+            "Paraffin oil": "#fcecba", "Patchouli oil": "#c5a000", "Pine oil": "#efd35e",
+            "Pineapple juice": "#ffd700", "Prune juice": "#581845", "Pomegranate juice": "#c0392b",
+            "Pinot Noir": "#722f37", "Plum wine": "#900C3F", "Pisco": "#f4e4c1",
+            "Pickle juice": "#c9db62", "Perchloric acid": "#d4e6f1", "Petroleum": "#2c3e50",
+            "Phosphoric acid": "#d4e6f1", "Propanol": "#d4e6f1", "Propylene glycol": "#d4e6f1",
+            "Plasma": "#fada5e"
+        };
+
+        const safeP = ["Palm oil", "Peanut oil", "Pickle juice", "Pineapple juice", "Pinot Noir", "Pisco", "Plum wine", "Pomegranate juice", "Prune juice"];
+        const deadlyP = ["Paraffin oil", "Perchloric acid", "Petroleum", "Phosphoric acid", "Propanol", "Propylene glycol", "Patchouli oil", "Pine oil", "Plasma"];
+        const ilks = ["Whole Milk", "Almond Milk", "Oat Milk", "Breast Milk", "Soy Milk", "Cashew Milk", "Skim Milk", "Condensed Milk", "Goat Milk", "Coconut Milk", "Chocolate Milk", "Pistachio Milk", "Strawberry Milk", "Coffee Milk", "Rat Milk", "Buttermilk", "Camel Milk", "Buffalo Milk", "Donkey Milk", "Yak Milk", "Reindeer Milk", "Moose Milk"];
+
+        function getWikiLink(name) {
+            let wikiName = name.split(' ').join('_');
+            return `<a href="https://en.wikipedia.org/wiki/${wikiName}" target="_blank" onclick="event.stopPropagation()">${name}</a>`;
+        }
+
+        function generateGame() {
+            // --- OPTION B (RIGHT) FIRST ---
+            const isDeadly = Math.random() < 0.5;
+            let pNameR = isDeadly ? deadlyP[Math.floor(Math.random()*deadlyP.length)] : safeP[Math.floor(Math.random()*safeP.length)];
+            let pPctR = isDeadly ? (Math.random()*(2-0.01)+0.01).toFixed(2) : Math.floor(Math.random()*101);
+            let iPctR = (100 - pPctR).toFixed(2);
+            let iNameR = ilks[Math.floor(Math.random()*ilks.length)];
+            let ozPR = (pPctR/100*16), ozIR = (iPctR/100*16);
+            let costR = (ozPR * prices[pNameR]) + (ozIR * prices[iNameR]);
+
+            document.getElementById('layerPLiquid').style.height = pPctR + "%";
+            document.getElementById('layerPLiquid').style.backgroundColor = colors[pNameR];
+            document.getElementById('layerIlkLiquid').style.height = iPctR + "%";
+            document.getElementById('layerIlkLiquid').style.backgroundColor = colors[iNameR];
+            document.getElementById('rightContent').innerHTML = `
+                <li><span class="percentage">${pPctR}%</span> ${getWikiLink(pNameR)} <span class="oz-label">(${ozPR.toFixed(2)}oz @ $${prices[pNameR].toFixed(2)}/oz)</span></li>
+                <li><span class="percentage">${iPctR}%</span> ${getWikiLink(iNameR)} <span class="oz-label">(${ozIR.toFixed(2)}oz @ $${prices[iNameR].toFixed(2)}/oz)</span></li>
+            `;
+            document.getElementById('rightTotal').innerText = `Total: $${costR.toFixed(2)}`;
+
+            // --- OPTION A (LEFT) ---
+            let p1;
+            if (isDeadly) {
+                // Deadly Logic: Guaranteed Piss with High Ceilings
+                const roll = Math.random();
+                if (roll < 0.8) {
+                    p1 = Math.floor(Math.random() * 33) + 1; // 1-33%
+                } else {
+                    let extra = Math.floor(Math.pow(Math.random(), 3) * 17);
+                    p1 = 33 + extra; // 33-50%
+                }
+            } else {
+                // Safe Logic: Guaranteed Piss but strictly 1-15%
+                p1 = Math.floor(Math.random() * 15) + 1;
+            }
+
+            let remaining = 100 - p1;
+            let p2 = Math.floor(Math.random() * (remaining + 1));
+            let p3 = remaining - p2;
+
+            let oz1 = (p1/100*16), oz2 = (p2/100*16), oz3 = (p3/100*16);
+            let costL = (oz2 * prices["Whole Milk"]) + (oz3 * prices["Pepsi"]);
+
+            document.getElementById('layerPiss').style.height = p1 + "%";
+            document.getElementById('layerMilk').style.height = p2 + "%";
+            document.getElementById('layerPepsi').style.height = p3 + "%";
+
+            let leftHTML = `<li><span class="percentage">${p1}%</span> ${getWikiLink("Piss")} <span class="oz-label">(${oz1.toFixed(2)}oz @ $0/oz)</span></li>`;
+            if (p2 > 0) leftHTML += `<li><span class="percentage">${p2}%</span> ${getWikiLink("Whole Milk")} <span class="oz-label">(${oz2.toFixed(2)}oz @ $${prices["Whole Milk"]}/oz)</span></li>`;
+            if (p3 > 0) leftHTML += `<li><span class="percentage">${p3}%</span> ${getWikiLink("Pepsi")} <span class="oz-label">(${oz3.toFixed(2)}oz @ $${prices["Pepsi"]}/oz)</span></li>`;
+
+            document.getElementById('leftContent').innerHTML = leftHTML;
+            document.getElementById('leftTotal').innerText = `Total: $${costL.toFixed(2)}`;
+        }
+
+        generateGame();
+    </script>
+</body>
+</html>

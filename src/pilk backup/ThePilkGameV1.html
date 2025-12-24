@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Would You Rather: Liquid Edition</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --accent: #00d2ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px var(--accent);
+            text-align: center;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1000px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            width: 350px;
+            min-height: 250px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .vs-circle {
+            background: var(--accent);
+            color: #1a1a2e;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px var(--accent);
+            align-self: center;
+        }
+
+        .mixture-list {
+            list-style: none;
+            padding: 0;
+            font-size: 1.4rem;
+            line-height: 2.2;
+        }
+
+        .percentage {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        button {
+            margin-top: 40px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: var(--accent);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            letter-spacing: 2px;
+            box-shadow: 0 0 30px var(--accent);
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .footer a:hover {
+            text-shadow: 0 0 10px var(--accent);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Would You Rather...</h1>
+
+    <div class="game-container">
+        <div class="card" id="leftCard">
+            <h2>Option A</h2>
+            <ul class="mixture-list" id="leftContent"></ul>
+        </div>
+
+        <div class="vs-circle">VS</div>
+
+        <div class="card" id="rightCard">
+            <h2>Option B</h2>
+            <ul class="mixture-list" id="rightContent"></ul>
+        </div>
+    </div>
+
+    <button onclick="generateGame()">New Round</button>
+
+    <div class="footer">
+        Brought to you by <a href="https://discord.gg/JKrVqPAfBE" target="_blank">GKGN</a>
+    </div>
+
+    <script>
+        const safePLiquids = [
+            "Palm oil", "Peanut oil", "Pickle juice", "Pineapple juice",
+            "Pinot Noir", "Pisco", "Plum wine", "Pomegranate juice", "Prune juice"
+        ];
+
+        const deadlyPLiquids = [
+            "Paraffin oil", "Perchloric acid", "Petroleum", "Phosphoric acid",
+            "Propanol", "Propylene glycol", "Patchouli oil", "Pine oil", "Plasma"
+        ];
+
+        const ilkLiquids = [
+            "Whole Milk", "Almond Milk", "Oat Milk", "Breast Milk", "Soy Milk",
+            "Cashew Milk", "Skim Milk", "Condensed Milk", "Goat Milk", "Coconut Milk",
+            "Chocolate Milk", "Pistachio Milk", "Strawberry Milk", "Coffee Milk",
+            "Rat Milk", "Buttermilk", "Camel Milk", "Buffalo Milk", "Donkey Milk",
+            "Yak Milk", "Reindeer Milk", "Moose Milk"
+        ];
+
+        function generateGame() {
+            // LEFT SIDE: Random Ratio (Piss, Milk, Pepsi) - Integers
+            let r1 = Math.random(), r2 = Math.random(), r3 = Math.random();
+            let totalLeft = r1 + r2 + r3;
+            let p1 = Math.floor((r1 / totalLeft) * 100);
+            let p2 = Math.floor((r2 / totalLeft) * 100);
+            let p3 = 100 - (p1 + p2);
+
+            document.getElementById('leftContent').innerHTML = `
+                <li><span class="percentage">${p1}%</span> Piss</li>
+                <li><span class="percentage">${p2}%</span> Milk</li>
+                <li><span class="percentage">${p3}%</span> Pepsi</li>
+            `;
+
+            // RIGHT SIDE: Random Ratio (P-Liquid and Ilk-Liquid)
+            const isDeadly = Math.random() < 0.5;
+            let pLiquidName, pRightVal, milkRightVal;
+
+            if (isDeadly) {
+                pLiquidName = deadlyPLiquids[Math.floor(Math.random() * deadlyPLiquids.length)];
+                // Weighted: 0.01% to 2.00%
+                pRightVal = (Math.random() * (2.00 - 0.01) + 0.01).toFixed(2);
+                milkRightVal = (100 - parseFloat(pRightVal)).toFixed(2);
+            } else {
+                pLiquidName = safePLiquids[Math.floor(Math.random() * safePLiquids.length)];
+                let split = Math.floor(Math.random() * 101);
+                pRightVal = split;
+                milkRightVal = 100 - split;
+            }
+
+            const randomIlk = ilkLiquids[Math.floor(Math.random() * ilkLiquids.length)];
+
+            document.getElementById('rightContent').innerHTML = `
+                <li><span class="percentage">${pRightVal}%</span> ${pLiquidName}</li>
+                <li><span class="percentage">${milkRightVal}%</span> ${randomIlk}</li>
+            `;
+        }
+
+        // Initialize
+        generateGame();
+    </script>
+</body>
+</html>
